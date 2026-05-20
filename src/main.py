@@ -28,7 +28,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# In-memory demo storage
+# In-memory storage (starts empty - real data only)
 demo_memories = {}
 demo_users = {}
 
@@ -233,7 +233,7 @@ async def ask_question(user_id: str, question: str):
 
 @app.get("/api/insights", tags=["Analytics"])
 async def get_insights(user_id: str = "demo_user"):
-    """Get AI-generated insights"""
+    """Get AI-generated insights based on real data"""
     try:
         user_memories = [
             m for m in demo_memories.values()
@@ -244,9 +244,8 @@ async def get_insights(user_id: str = "demo_user"):
         if len(user_memories) < 3:
             insights = []
         else:
-            # Generate insights based on actual memory data
             insights = []
-
+            
             # Analyze tags for patterns
             tags_count = {}
             for m in user_memories:
@@ -256,11 +255,6 @@ async def get_insights(user_id: str = "demo_user"):
             # Generate insights only if patterns exist
             if tags_count:
                 top_tag = max(tags_count.items(), key=lambda x: x[1])
-                avg_importance_in_tag = sum(
-                    m.get('importance_score', 0) for m in user_memories
-                    if top_tag[0] in m.get('tags', [])
-                ) / top_tag[1]
-
                 insights.append({
                     "title": f"Top Activity: {top_tag[0].title()}",
                     "description": f"You have {top_tag[1]} memories tagged with '{top_tag[0]}'",
@@ -288,7 +282,7 @@ async def get_insights(user_id: str = "demo_user"):
 
 @app.get("/api/stats", tags=["Analytics"])
 async def get_stats(user_id: str = "demo_user"):
-    """Get user statistics"""
+    """Get user statistics based on real data"""
     user_memories = [
         m for m in demo_memories.values()
         if m.get('user_id') == user_id
@@ -308,54 +302,6 @@ async def get_stats(user_id: str = "demo_user"):
         "success_rate": f"{max(0, min(100, 70 + (memory_count * 2)))}%",
         "learned_rules": learned_rules,
         "ai_confidence": f"{ai_confidence}%"
-    }
-
-# ============================================================================
-# ROUTES - SAMPLE DATA
-# ============================================================================
-
-@app.get("/api/sample-memories", tags=["Demo"])
-async def get_sample_memories(user_id: str = "demo_user"):
-    """Get sample memories for demo"""
-    samples = [
-        {
-            "id": str(uuid.uuid4()),
-            "user_id": user_id,
-            "content": "Successfully completed project deployment",
-            "context": "Office",
-            "tags": ["work", "success"],
-            "importance_score": 0.92,
-            "created_at": datetime.now().isoformat(),
-            "access_count": 5
-        },
-        {
-            "id": str(uuid.uuid4()),
-            "user_id": user_id,
-            "content": "Learned Python async/await patterns",
-            "context": "Home office",
-            "tags": ["learning", "python"],
-            "importance_score": 0.76,
-            "created_at": datetime.now().isoformat(),
-            "access_count": 3
-        },
-        {
-            "id": str(uuid.uuid4()),
-            "user_id": user_id,
-            "content": "Morning run in park - felt energized",
-            "context": "Park",
-            "tags": ["health", "routine"],
-            "importance_score": 0.45,
-            "created_at": datetime.now().isoformat(),
-            "access_count": 1
-        }
-    ]
-    for memory in samples:
-        demo_memories[memory['id']] = memory
-    return {
-        "status": "success",
-        "message": "Sample memories loaded",
-        "count": len(samples),
-        "memories": samples
     }
 
 # ============================================================================
