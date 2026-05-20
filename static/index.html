@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Episodic AI Memory System - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            color: #667eea;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            gap: 20px;
+            margin-left: auto;
+            margin-right: 20px;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        nav button:hover, nav button.active {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Main Grid */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: #999;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        /* Content Area */
+        .content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .importance-slider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+        }
+
+        .importance-value {
+            color: #667eea;
+            font-weight: bold;
+            min-width: 40px;
+        }
+
+        /* Button Styles */
+        button.btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        button.btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        button.btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        button.btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        /* Memory Item */
+        .memory-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s;
+        }
+
+        .memory-item:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            transform: translateX(5px);
+        }
+
+        .memory-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .memory-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        .memory-content {
+            color: #666;
+            font-size: 14px;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        .memory-tags {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: #667eea;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+        .importance-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .importance-high {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .importance-medium {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .importance-low {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        /* Search Box */
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            padding-left: 35px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .sidebar h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 20px;
+        }
+
+        .sidebar-item {
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-item:hover {
+            background: #667eea;
+            color: white;
+            border-left-color: #764ba2;
+        }
+
+        .sidebar-item-label {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 3px;
+        }
+
+        /* Insights */
+        .insight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .insight-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .insight-content {
+            font-size: 13px;
+            line-height: 1.5;
+            opacity: 0.95;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .mini-stat {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .mini-stat-value {
+            font-size: 20px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .mini-stat-label {
+            font-size: 12px;
+            color: #999;
+            margin-top: 3px;
+        }
+
+        /* Tab System */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            nav {
+                margin-left: 0;
+                margin-right: 0;
+            }
+        }
+
+        /* Animation */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: slideIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🧠 Memory System</h1>
+            <nav>
+                <button class="active" onclick="switchTab('dashboard')">Dashboard</button>
+                <button onclick="switchTab('create')">New Memory</button>
+                <button onclick="switchTab('search')">Search</button>
+                <button onclick="switchTab('insights')">Insights</button>
+                <button onclick="switchTab('settings')">Settings</button>
+            </nav>
+            <div class="user-profile">
+                <div class="user-avatar">JD</div>
+                <span>John Doe</span>
+            </div>
+        </header>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <!-- Stats Cards -->
+            <div class="dashboard">
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-label">Total Memories</div>
+                    <div class="stat-value">1,247</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🧠</div>
+                    <div class="stat-label">Learned Rules</div>
+                    <div class="stat-value">87</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-label">AI Confidence</div>
+                    <div class="stat-value">94%</div>
+                </div>
+            </div>
+
+            <div class="content">
+                <!-- Recent Memories -->
+                <div class="card">
+                    <h2>Recent Memories</h2>
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" placeholder="Search memories...">
+                    </div>
+
+                    <div class="memory-item">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <div class="memory-title">Successfully completed project deployment</div>
+                                <div class="memory-content">Deployed new feature to production. Team collaboration was excellent. Used automated testing which saved 2 hours.</div>
+                            </div>
+                            <span class="importance-badge importance-high">HIGH</span>
+                        </div>
+                        <div class="memory-meta">
+                            <span>📅 Today at 3:45 PM</span>
+                            <span>⭐ Importance: 0.92</span>
+                            <span>👁️ 5 views</span>
+                        </div>
+                        <div class="memory-tags">
+                            <span class="tag">work</span>
+                            <span class="tag">success</span>
+                            <span class="tag">deployment</span>
+                        </div>
+                    </div>
+
+                    <div class="memory-item">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <div class="memory-title">Learned new Python pattern</div>
+                                <div class="memory-content">Discovered async/await pattern. Much cleaner than callbacks. Took 1.5 hours to fully understand.</div>
+                            </div>
+                            <span class="importance-badge importance-medium">MEDIUM</span>
+                        </div>
+                        <div class="memory-meta">
+                            <span>📅 Yesterday at 7:30 PM</span>
+                            <span>⭐ Importance: 0.76</span>
+                            <span>👁️ 3 views</span>
+                        </div>
+                        <div class="memory-tags">
+                            <span class="tag">learning</span>
+                            <span class="tag">python</span>
+                            <span class="tag">technical</span>
+                        </div>
+                    </div>
+
+                    <div class="memory-item">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <div class="memory-title">Morning exercise routine</div>
+                                <div class="memory-content">30-minute run in park. Felt energized. Better focus for rest of day.</div>
+                            </div>
+                            <span class="importance-badge importance-low">LOW</span>
+                        </div>
+                        <div class="memory-meta">
+                            <span>📅 2 days ago</span>
+                            <span>⭐ Importance: 0.45</span>
+                            <span>👁️ 1 view</span>
+                        </div>
+                        <div class="memory-tags">
+                            <span class="tag">health</span>
+                            <span class="tag">routine</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <h3>📊 Quick Insights</h3>
+
+                    <div class="insight">
+                        <div class="insight-title">💡 Learning Pattern</div>
+                        <div class="insight-content">You learn 42% faster with code examples vs reading documentation.</div>
+                    </div>
+
+                    <div class="insight">
+                        <div class="insight-title">⏰ Peak Performance</div>
+                        <div class="insight-content">Your productivity peaks between 9am-12pm and 8pm-10pm.</div>
+                    </div>
+
+                    <div class="insight">
+                        <div class="insight-title">🎯 Success Pattern</div>
+                        <div class="insight-content">Projects with planning & breaks are 3x more likely to succeed.</div>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">🏷️ Top Tags</h3>
+                    <div class="sidebar-section">
+                        <div class="sidebar-item">
+                            <strong>work</strong>
+                            <div class="sidebar-item-label">324 memories</div>
+                        </div>
+                        <div class="sidebar-item">
+                            <strong>learning</strong>
+                            <div class="sidebar-item-label">187 memories</div>
+                        </div>
+                        <div class="sidebar-item">
+                            <strong>success</strong>
+                            <div class="sidebar-item-label">156 memories</div>
+                        </div>
+                        <div class="sidebar-item">
+                            <strong>productivity</strong>
+                            <div class="sidebar-item-label">98 memories</div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">📈 Stats</h3>
+                    <div class="stats-row">
+                        <div class="mini-stat">
+                            <div class="mini-stat-value">8.4</div>
+                            <div class="mini-stat-label">Avg Importance</div>
+                        </div>
+                        <div class="mini-stat">
+                            <div class="mini-stat-value">23</div>
+                            <div class="mini-stat-label">This Week</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Memory Tab -->
+        <div id="create" class="tab-content">
+            <div class="card" style="max-width: 800px; margin: 0 auto;">
+                <h2>📝 Create New Memory</h2>
+
+                <form>
+                    <div class="form-group">
+                        <label for="title">Memory Title *</label>
+                        <input type="text" id="title" placeholder="What happened? (e.g., Completed project, Learned new skill)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="content">What happened? *</label>
+                        <textarea id="content" placeholder="Describe the experience in detail. Include what you did, how you felt, what worked well, what could improve..."></textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label for="date">Date & Time</label>
+                            <input type="datetime-local" id="date">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="context">Context/Location</label>
+                            <input type="text" id="context" placeholder="e.g., Office, Home, Park">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="people">People Involved</label>
+                        <input type="text" id="people" placeholder="e.g., Team members, friends">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tags">Tags</label>
+                        <input type="text" id="tags" placeholder="e.g., work, learning, success (comma separated)">
+                    </div>
+
+                    <div class="form-group">
+                        <label>How Important Was This?</label>
+                        <div class="importance-slider">
+                            <input type="range" id="importance" min="0" max="100" value="50" onchange="updateImportance(this.value)">
+                            <span class="importance-value" id="importanceValue">50%</span>
+                        </div>
+                        <div style="font-size: 12px; color: #999; margin-top: 5px;">
+                            <span>Low</span>
+                            <span style="float: right;">High</span>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
+                        <button type="button" class="btn">Save Memory</button>
+                        <button type="button" class="btn btn-secondary">Clear</button>
+                    </div>
+
+                    <div style="background: #f0f0f0; padding: 15px; border-radius: 5px; margin-top: 20px; font-size: 14px; color: #666;">
+                        <strong>💡 Tip:</strong> The more details you provide, the better the system can learn from this experience and help you in the future!
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Search Tab -->
+        <div id="search" class="tab-content">
+            <div class="content">
+                <div class="card">
+                    <h2>🔍 Search Memories</h2>
+
+                    <div class="form-group">
+                        <input type="text" placeholder="Ask me anything... (e.g., 'How can I be more productive?', 'What works best for learning?')">
+                    </div>
+
+                    <button class="btn">Search</button>
+
+                    <div style="margin-top: 30px;">
+                        <h3 style="color: #667eea; margin-bottom: 15px;">📌 Sample Queries</h3>
+
+                        <div class="sidebar-item" style="cursor: pointer; margin-bottom: 10px;">
+                            <strong>What's my best learning style?</strong>
+                            <div class="sidebar-item-label">Get personalized learning insights</div>
+                        </div>
+
+                        <div class="sidebar-item" style="cursor: pointer; margin-bottom: 10px;">
+                            <strong>When am I most productive?</strong>
+                            <div class="sidebar-item-label">Discover your peak performance hours</div>
+                        </div>
+
+                        <div class="sidebar-item" style="cursor: pointer; margin-bottom: 10px;">
+                            <strong>What helps with stress?</strong>
+                            <div class="sidebar-item-label">Get recommendations based on your history</div>
+                        </div>
+
+                        <div class="sidebar-item" style="cursor: pointer;">
+                            <strong>Why did my last project succeed?</strong>
+                            <div class="sidebar-item-label">Learn what went right</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🎯 AI Response</h2>
+                    <div style="color: #999; padding: 40px 20px; text-align: center;">
+                        <p style="margin-bottom: 20px;">Try a search query to see AI-powered insights based on your memories and learned patterns.</p>
+                        <p style="font-size: 12px;">The system will analyze your past experiences and provide personalized recommendations with reasoning.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Insights Tab -->
+        <div id="insights" class="tab-content">
+            <div class="dashboard" style="margin-bottom: 30px;">
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-label">Success Rate</div>
+                    <div class="stat-value">87%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-label">Learning Speed</div>
+                    <div class="stat-value">+34%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-label">Avg Satisfaction</div>
+                    <div class="stat-value">8.5/10</div>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="card">
+                    <h2>🧠 Discovered Patterns</h2>
+
+                    <div class="insight" style="margin-bottom: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="insight-title">Pattern #1: Learning Effectiveness</div>
+                        <div class="insight-content">
+                            <strong>Finding:</strong> You learn 42% faster with code examples than reading documentation.<br>
+                            <strong>Confidence:</strong> 94% (based on 23 learning sessions)<br>
+                            <strong>Recommendation:</strong> Prioritize example-based resources.
+                        </div>
+                    </div>
+
+                    <div class="insight" style="margin-bottom: 15px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="insight-title">Pattern #2: Peak Performance Hours</div>
+                        <div class="insight-content">
+                            <strong>Finding:</strong> Your productivity peaks 9am-12pm and 8pm-10pm.<br>
+                            <strong>Confidence:</strong> 89% (based on 45 productivity sessions)<br>
+                            <strong>Recommendation:</strong> Schedule important work during these hours.
+                        </div>
+                    </div>
+
+                    <div class="insight" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="insight-title">Pattern #3: Success Factors</div>
+                        <div class="insight-content">
+                            <strong>Finding:</strong> Projects with upfront planning are 3.2x more likely to succeed.<br>
+                            <strong>Confidence:</strong> 91% (based on 34 projects)<br>
+                            <strong>Recommendation:</strong> Always spend 30 minutes planning before starting.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <h3>📊 Learned Rules</h3>
+
+                    <div class="sidebar-section">
+                        <div class="sidebar-item" style="background: #f0f8ff; border-left-color: #4facfe;">
+                            <div><strong>IF</strong> planning=true AND time < 2h <br><strong>THEN</strong> success=high</div>
+                            <div class="sidebar-item-label">Confidence: 92% | Frequency: 18x</div>
+                        </div>
+
+                        <div class="sidebar-item" style="background: #f0fff4; border-left-color: #2ecc71;">
+                            <div><strong>IF</strong> examples=used AND focus=high <br><strong>THEN</strong> learning_speed=fast</div>
+                            <div class="sidebar-item-label">Confidence: 88% | Frequency: 23x</div>
+                        </div>
+
+                        <div class="sidebar-item" style="background: #fff0f6; border-left-color: #e74c3c;">
+                            <div><strong>IF</strong> tired=true AND task=complex <br><strong>THEN</strong> failure_risk=high</div>
+                            <div class="sidebar-item-label">Confidence: 85% | Frequency: 12x</div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">🔮 Predictions</h3>
+                    <div class="insight" style="margin-bottom: 10px;">
+                        <div class="insight-title">This Project</div>
+                        <div class="insight-content">Success probability: <strong>89%</strong></div>
+                    </div>
+                    <div class="insight">
+                        <div class="insight-title">Learning This Skill</div>
+                        <div class="insight-content">Time to proficiency: <strong>14 days</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <div class="card" style="max-width: 800px; margin: 0 auto;">
+                <h2>⚙️ Settings</h2>
+
+                <h3 style="color: #333; margin-top: 25px; margin-bottom: 15px;">Account Settings</h3>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" value="John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" value="john@example.com">
+                </div>
+
+                <h3 style="color: #333; margin-top: 25px; margin-bottom: 15px;">Privacy & Data</h3>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" checked> Allow AI to analyze my memories for pattern learning
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" checked> Use my data to improve recommendations
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox"> Allow research on anonymized patterns
+                    </label>
+                </div>
+
+                <h3 style="color: #333; margin-top: 25px; margin-bottom: 15px;">Notifications</h3>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" checked> Notify me of important insights
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" checked> Daily summary email
+                    </label>
+                </div>
+
+                <h3 style="color: #333; margin-top: 25px; margin-bottom: 15px;">Data Management</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                    <button class="btn btn-secondary">Download My Data</button>
+                    <button class="btn btn-secondary">Export Memories</button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 10px; margin-bottom: 30px;">
+                    <button class="btn" style="background: #27ae60;">Save Changes</button>
+                    <button class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Deactivate all buttons
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Activate button
+            event.target.classList.add('active');
+        }
+
+        function updateImportance(value) {
+            document.getElementById('importanceValue').textContent = value + '%';
+        }
+    </script>
+</body>
+</html>
