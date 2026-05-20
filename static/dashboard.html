@@ -518,8 +518,8 @@
                 <button onclick="switchTab('settings')">Settings</button>
             </nav>
             <div class="user-profile">
-                <div class="user-avatar">JD</div>
-                <span>John Doe</span>
+                <div class="user-avatar" id="userAvatar">U</div>
+                <span id="userName">User</span> | <button onclick="logout()" style="background: none; border: none; color: #667eea; cursor: pointer; font-size: 12px; margin-left: 10px;">Logout</button>
             </div>
         </header>
 
@@ -704,11 +704,11 @@
                 <h3 style="color: #333; margin-top: 25px; margin-bottom: 15px;">Account Settings</h3>
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" value="John Doe">
+                    <input type="text" placeholder="Enter your name">
                 </div>
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" value="john@example.com">
+                    <input type="email" placeholder="Enter your email">
                 </div>
 
                 <h3 style="color: #333; margin-top: 25px; margin-bottom: 15px;">Privacy & Data</h3>
@@ -739,7 +739,35 @@
     </div>
 
     <script>
+    // Check authentication on page load
+    window.addEventListener('load', () => {
+        const user_id = localStorage.getItem('user_id');
+        const username = localStorage.getItem('username');
+        
+        if (!user_id) {
+            window.location.href = '/';
+            return;
+        }
+        
+        // Update user display
+        const userNameEl = document.getElementById('userName');
+        const userAvatarEl = document.getElementById('userAvatar');
+        
+        if (userNameEl) userNameEl.textContent = username || 'User';
+        if (userAvatarEl) userAvatarEl.textContent = (username || 'U')[0].toUpperCase();
+        
+        loadDashboard();
+    });
+
+    function logout() {
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('username');
+        localStorage.removeItem('user_name');
+        window.location.href = '/';
+    }
+
         const API_BASE = '/api';
+    const user_id = localStorage.getItem('user_id');
         
         // Tab switching
         function switchTab(tabName) {
@@ -761,7 +789,7 @@
         // Load dashboard data
         async function loadDashboard() {
             try {
-                const statsRes = await fetch(API_BASE + '/stats?user_id=demo_user');
+                const statsRes = await fetch(API_BASE + '/stats?user_id=' + user_id?user_id=demo_user');
                 const stats = await statsRes.json();
                 
                 document.getElementById('totalMemories').textContent = stats.total_memories || 0;
@@ -810,7 +838,7 @@
                 }
 
                 // Load insights
-                const insightsRes = await fetch(API_BASE + '/insights?user_id=demo_user');
+                const insightsRes = await fetch(API_BASE + '/insights?user_id=' + user_id?user_id=demo_user');
                 const insightsData = await insightsRes.json();
                 const insights = insightsData.insights || [];
 
@@ -853,7 +881,7 @@
             };
 
             try {
-                const response = await fetch(API_BASE + '/memories', {
+                const response = await fetch(API_BASE + '/memories?user_id=' + user_id, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(memory)
