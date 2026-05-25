@@ -7,7 +7,6 @@ A hierarchical memory architecture for AI agents that stores important events, f
 **Author:** Master (parth.garggkota@gmail.com)
 
 ---
-
 ## Quick Overview
 
 This project solves a fundamental problem with current AI memory: **traditional RAG (Retrieval Augmented Generation) treats all information equally**. Our system uses importance scoring to determine:
